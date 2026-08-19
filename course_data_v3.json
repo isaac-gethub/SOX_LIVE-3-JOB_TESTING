@@ -1,0 +1,816 @@
+[
+  {
+    "book_num": 1,
+    "part_numeral": "I",
+    "part_title": "Access Control & Identity — Multi-Entity Testing",
+    "sort_order": 1,
+    "shortname": "The Role That Outlived Its Purpose",
+    "subtitle": "Access Control / SoD",
+    "intro": "Confirm that a role's current authorization content still matches its original design intent, and that any scope drift accumulated since assignment has not introduced an undetected SoD conflict.",
+    "exec_table": [
+      {
+        "tool": "GRC Access Control",
+        "code": "GRAC_ARA",
+        "directions": "Run Access Risk Analysis at role level for the role in scope, comparing its current authorization content against the role's original design specification. [Navigation: from the Fiori Launchpad, open the 'Access Risk Analysis' tile (App Finder search if not pinned) — or in NWBC, expand GRC → Access Management → Access Risk Analysis. Set Analysis Type = Role Level, enter the role name, and click Search/Execute.]",
+        "screenshot": null
+      },
+      {
+        "tool": "SAP GUI",
+        "code": "PFCG",
+        "directions": "Pull the role's full change history to identify every authorization object added since the role's original creation. [Navigation: type PFCG in the command field and press Enter, enter the role name, click Display (glasses icon), open the Change Documents / history view from the role's menu, and list each version's delta chronologically.]",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Compare the accumulated changes against the role's original job-ad scope or design document to identify scope drift that was never risk-assessed at the time it was added.",
+        "screenshot": null
+      },
+      {
+        "tool": "GRC Access Control",
+        "code": "GRAC_ARA",
+        "directions": "Re-run Access Risk Analysis at user level for every individual currently assigned the role, to confirm whether the drifted scope has created a live conflict for any specific person. [Navigation: in the same Access Risk Analysis app, set Analysis Type = User Level, filter by the role name in the 'role assigned' field, and execute.]",
+        "screenshot": null
+      }
+    ],
+    "evidence": "Pre- and current PFCG change history export for the role, cross-referenced against a current Access Risk Analysis run at both role and user level.",
+    "pitfall": "A role that has never triggered a rule violation is not the same as a role whose scope has stayed constant — always check the change history, not just the current-state risk analysis result."
+  },
+  {
+    "book_num": 2,
+    "part_numeral": "I",
+    "part_title": "Access Control & Identity — Multi-Entity Testing",
+    "sort_order": 2,
+    "shortname": "The ID With Five Faces",
+    "subtitle": "Access Control — Shared IDs",
+    "intro": "Confirm whether activity performed under a shared or generic ID can be reliably attributed to the individual who actually performed it, and identify the control gap where it cannot.",
+    "exec_table": [
+      {
+        "tool": "SAP GUI",
+        "code": "SM20",
+        "directions": "Pull the security audit log for the shared/generic ID for the test period. [Navigation: type SM20 in the command field and press Enter, enter the shared ID in the User field, set the date range, select the relevant audit classes, and execute.]",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Identify every individual who had knowledge of or access to the shared ID's credentials during the period, from password-reset records, ticketing system access logs, or team rosters.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "For a sample of sensitive transactions in the SM20 log, attempt to independently corroborate who actually performed the action, using supplementary evidence such as physical access logs, calendar records, or corroborating timestamps from an adjacent system.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Document, for each sensitive action sampled, whether individual attribution was achievable at all, and treat any action that cannot be attributed to a specific person as an open control gap rather than assuming the most likely user performed it.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "SM20 audit log export for the shared ID for the test period, with a documented attempt (successful or not) to attribute each sampled sensitive action to a specific individual.",
+    "pitfall": "SM20 can tell you which ID performed an action; it can never on its own tell you which person was behind that ID — don't let a plausible name in a nearby record substitute for actual attribution."
+  },
+  {
+    "book_num": 3,
+    "part_numeral": "I",
+    "part_title": "Access Control & Identity — Multi-Entity Testing",
+    "sort_order": 3,
+    "shortname": "The Approver Who Never Looked",
+    "subtitle": "GRC Access Request Workflow",
+    "intro": "Confirm that completed GRC access request approvals reflect genuine review of the requested access against the requester's role, not a rubber-stamp approval completed on schedule.",
+    "exec_table": [
+      {
+        "tool": "GRC Access Control",
+        "code": "Access Request app",
+        "directions": "Pull a sample of completed and approved access requests for the test period. [Navigation: from the Fiori Launchpad, open the Access Request or My Access Requests app (or in NWBC, GRC → Access Management → Access Requests), filter by status = Approved and the test period date range, and export the resulting list.]",
+        "screenshot": null
+      },
+      {
+        "tool": "GRC Access Control",
+        "code": "GRAC_ARA",
+        "directions": "For each sampled request, independently assess whether the access ultimately granted matches what the requester's job role and business justification actually required. [Navigation: open Access Risk Analysis at user level for the requesting individual, filter to the access granted through the sampled request, and compare against the stated business justification on the request record.]",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Review the approver's actual review time (the elapsed timestamp between request submission and approval) against the complexity of the request — a multi-line-item request approved in under a minute warrants closer scrutiny.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Where granted access exceeds what the justification supports, document the specific over-provisioned access and trace whether this pattern repeats across other requests approved by the same approver.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "Sampled Access Request records (request, justification, approval timestamp) cross-referenced against an independent Access Risk Analysis of the access actually granted.",
+    "pitfall": "A completed approval workflow with a timestamp and an approver's name is evidence a step occurred, not evidence that genuine review took place — test the substance of the decision, not just its existence."
+  },
+  {
+    "book_num": 4,
+    "part_numeral": "I",
+    "part_title": "Access Control & Identity — Multi-Entity Testing",
+    "sort_order": 4,
+    "shortname": "The Perfect Completion Rate",
+    "subtitle": "Access Recertification",
+    "intro": "Confirm whether the access recertification campaign presents reviewers with actual underlying authorization content, or only a summary role name that makes genuine review structurally impossible.",
+    "exec_table": [
+      {
+        "tool": "GRC Access Control",
+        "code": "GRAC_ARM",
+        "directions": "Open the completed recertification campaign for the test period. [Navigation: from the Fiori Launchpad, open the User Access Review (UAR) or Access Certification app (or in NWBC, GRC → Access Management → Access Certification), select the campaign, and open its configuration.]",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Confirm whether the campaign's review screen, as configured, presents reviewers with the underlying authorization objects and transaction codes within each role, or only the role's summary name and description. [Navigation: within the campaign configuration, review the 'Review Detail Level' or equivalent display setting, and separately open a sample completed review as the reviewer would have seen it.]",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "For a sample of certified (approved) line items, compare what was actually certified against the role's real authorization content pulled independently via GRAC_ARA or PFCG.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Where the review configuration only exposes role-name-level information, document this as a structural finding — a 100% completion rate under this configuration does not demonstrate that any reviewer could have caught an inappropriate access assignment even if they wanted to.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "Recertification campaign configuration screenshot showing review detail level, plus a sample of completed review line items compared against the role's actual authorization content.",
+    "pitfall": "A recertification campaign's completion rate measures whether reviewers clicked 'approve' — it says nothing about whether the tool gave them enough information to make that decision meaningfully."
+  },
+  {
+    "book_num": 5,
+    "part_numeral": "I",
+    "part_title": "Access Control & Identity — Multi-Entity Testing",
+    "sort_order": 5,
+    "shortname": "The Merger of Two Desks",
+    "subtitle": "Access Control — Org Restructuring",
+    "intro": "Confirm whether an organizational restructuring that placed two previously separate functions under a single manager created a new SoD conflict through that manager's own combined access, even though each function's access remains individually well-scoped.",
+    "exec_table": [
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Identify the organizational restructuring event and the specific individual(s) who now sit above two or more previously separate functions.",
+        "screenshot": null
+      },
+      {
+        "tool": "SAP GUI",
+        "code": "SU01",
+        "directions": "Pull the manager's own user master record to confirm which roles are directly assigned. [Navigation: type SU01 in the command field and press Enter, enter the manager's user ID, and open the Roles tab to list all currently assigned roles.]",
+        "screenshot": null
+      },
+      {
+        "tool": "GRC Access Control",
+        "code": "GRAC_ARA",
+        "directions": "Run Access Risk Analysis at user level for the manager, combining the access from both merged functions, to test for an SoD conflict that exists only because of the org chart change. [Navigation: from the Fiori Launchpad, open Access Risk Analysis, set Analysis Type = User Level, enter the manager's user ID, and execute against the full standard ruleset.]",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Where a conflict is confirmed, document that each function's access remained individually well-scoped, and that the conflict was introduced entirely through the reporting-line change rather than through either role's own design.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "SU01 role listing for the manager combined with a user-level Access Risk Analysis export showing the conflict (or its confirmed absence).",
+    "pitfall": "An org chart change that never touches PFCG or SU01 directly can still create a live SoD conflict — testing only role design changes will miss this category of finding entirely."
+  },
+  {
+    "book_num": 6,
+    "part_numeral": "II",
+    "part_title": "Change Management & Operations — Cross-System and Cross-Entity",
+    "sort_order": 6,
+    "shortname": "The System Nobody Called SAP",
+    "subtitle": "ITGC Change Management",
+    "intro": "Confirm that changes made through a non-SAP middleware or integration layer connecting two merged organizations' systems are captured, approved, and traceable with the same rigor as changes made directly within SAP.",
+    "exec_table": [
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Identify the middleware or integration layer connecting the two merged organizations' systems, and confirm whether it maintains its own change or deployment log.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Pull the integration layer's native deployment log for the test period, since it is unlikely to be captured by SAP's standard transport system (STMS).",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "For each change in the log, trace which financial or operational data flows it affects, and confirm whether the change went through an approval process comparable in rigor to SAP's own change management.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Document any change in the integration layer's log that has no corresponding approval record, and assess whether this middleware layer has effectively been operating outside the organization's documented change management scope entirely.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "The integration layer's native deployment log for the test period, cross-referenced against approval records and the financial/operational data flows each change affects.",
+    "pitfall": "A change management control scoped only to SAP's own transport system will show a clean population while missing an entire unmonitored layer sitting between two merged organizations' systems."
+  },
+  {
+    "book_num": 7,
+    "part_numeral": "II",
+    "part_title": "Change Management & Operations — Cross-System and Cross-Entity",
+    "sort_order": 7,
+    "shortname": "The Rollout That Rolled Back",
+    "subtitle": "ITGC — Multi-Entity Shared Services",
+    "intro": "Confirm that a transport rollback was tested and approved with the same rigor as the original change, and that the reversion target state is verified correct for every affected entity individually, not assumed uniform across a shared-services environment.",
+    "exec_table": [
+      {
+        "tool": "SAP GUI",
+        "code": "STMS",
+        "directions": "Identify the rollback transport and the original change it reverses. [Navigation: type STMS in the command field and press Enter, open the import queue or transport log, locate the rollback transport by its description or linked reference to the original transport, and open its object list.]",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Confirm the rollback transport received its own independent approval, with the same rigor as the original change, rather than being treated as automatically pre-approved because it reverses something already approved.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "For each entity served by the shared-services environment, independently confirm the actual post-rollback state of the affected configuration or program, rather than assuming a single successful import confirms a uniform reversion across every entity.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Document any entity where the post-rollback state does not match the intended reversion target, and trace whether this was caught by the standard change management process or only surfaced through this independent test.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "STMS transport log for the rollback transport, its independent approval record, and an entity-by-entity confirmation of the actual post-rollback configuration state.",
+    "pitfall": "A rollback is still a change and requires its own approval and its own verification — never assume a successful technical import confirms the intended state for every entity in a shared-services environment."
+  },
+  {
+    "book_num": 8,
+    "part_numeral": "II",
+    "part_title": "Change Management & Operations — Cross-System and Cross-Entity",
+    "sort_order": 8,
+    "shortname": "The Cadence That Died Quietly",
+    "subtitle": "ITGC — Patch Management",
+    "intro": "Confirm that a critical recurring patch or maintenance process has documented backup ownership and an attestation mechanism that would flag an interruption automatically, rather than depending silently on one individual's continued presence.",
+    "exec_table": [
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Identify the critical recurring patch or maintenance process in scope and its documented owner of record.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Confirm whether a documented backup owner exists for the process, independent of the primary owner's continued presence or availability.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Confirm whether an attestation or monitoring mechanism exists that would automatically flag a missed cycle, rather than relying on someone noticing the absence.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Where no backup ownership or automatic attestation exists, document the process as carrying single-person-dependency risk, and note how long the process has been running without this being identified.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "The process's documented ownership record (primary and backup, if any) and any attestation or monitoring configuration confirming automatic detection of a missed cycle.",
+    "pitfall": "A process with a long, unbroken history of on-time execution can still be a single point of failure — the absence of a documented backup owner is the finding, not something a clean historical record excuses."
+  },
+  {
+    "book_num": 9,
+    "part_numeral": "II",
+    "part_title": "Change Management & Operations — Cross-System and Cross-Entity",
+    "sort_order": 9,
+    "shortname": "The Qualified Opinion",
+    "subtitle": "ITGC — Third-Party / SOC Reliance",
+    "intro": "Confirm that each entity within a combined organization relying on a shared vendor holds its own, separately reviewed SOC report, and that reliance is not assumed to transfer from one entity's clean opinion to a sibling entity's separate contractual relationship.",
+    "exec_table": [
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Identify every entity within the combined organization that relies on the vendor in scope, and confirm whether each entity holds its own separate contractual relationship or service tier.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Obtain each entity's own SOC report (or confirm a shared report explicitly covers all entities' specific service scope), rather than assuming one entity's clean SOC opinion extends to a sibling entity.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Review each entity's SOC report individually for the user-entity controls section, confirming the client-side responsibilities assigned there are actually being performed for that specific entity.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Document any entity relying on a SOC report that does not explicitly cover its own contractual relationship or service tier as an open reliance gap, regardless of the vendor's overall reputation.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "Each entity's own SOC report (or explicit scope confirmation) and the user-entity controls section reviewed against that entity's actual practice.",
+    "pitfall": "A shared vendor name does not mean a shared SOC opinion — reliance must be tested at the level of the actual contractual relationship, not the vendor relationship in general."
+  },
+  {
+    "book_num": 10,
+    "part_numeral": "II",
+    "part_title": "Change Management & Operations — Cross-System and Cross-Entity",
+    "sort_order": 10,
+    "shortname": "The Hardcoded Password",
+    "subtitle": "Custom Code / ABAP Security",
+    "intro": "Confirm that a prioritized, risk-ranked Code Inspector sweep of an inherited acquisition codebase has covered financial-posting, payment-processing, and master-data programs first, and that any hardcoded credentials or bypass logic surfaced are remediated.",
+    "exec_table": [
+      {
+        "tool": "SAP GUI",
+        "code": "SE38 / SE80",
+        "directions": "Inventory the custom program population inherited from the acquisition. [Navigation: type SE38 (or SE80 for the full Object Navigator) in the command field and press Enter, use the program search with the acquired system's custom namespace/prefix, and export the resulting object list.]",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Risk-rank the inventoried programs by criticality, prioritizing those touching financial postings, payment processing, and master data changes first.",
+        "screenshot": null
+      },
+      {
+        "tool": "SAP GUI",
+        "code": "SCI",
+        "directions": "Run a Code Inspector scan against the prioritized programs. [Navigation: type SCI in the command field and press Enter (or reach it from SE38/SE80 → Code Inspector), create a new inspection variant covering the prioritized program list, select the security/hardcoded-credential check set, and execute.]",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "For any finding involving a hardcoded credential, bypass logic, or other high-severity issue, confirm whether the program is currently in active use before prioritizing remediation, and document the finding with the SCI result as evidence.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "The risk-ranked custom program inventory and the SCI (Code Inspector) scan results for the prioritized population, including any hardcoded-credential findings.",
+    "pitfall": "A full retroactive code review of an entire inherited codebase is rarely tractable in the time available — prioritization by financial criticality is a legitimate, defensible testing strategy, but it must be documented as a scoping decision, not silently treated as full coverage."
+  },
+  {
+    "book_num": 11,
+    "part_numeral": "III",
+    "part_title": "R2R & Consolidation — Post-Merger Specific",
+    "sort_order": 11,
+    "shortname": "The Elimination That Didn't",
+    "subtitle": "Record to Report — Consolidation",
+    "intro": "Confirm that the full intercompany transaction population reconciles to automated elimination logic transaction-by-transaction, rather than trusting a summary elimination total that may not recognize legacy entity-coded transactions.",
+    "exec_table": [
+      {
+        "tool": "SAP GUI",
+        "code": "FBL3N / FB03",
+        "directions": "Pull the full intercompany transaction population for the consolidation period. [Navigation: type FBL3N in the command field and press Enter, restrict the company code selection to the intercompany accounts in scope, set the period, and execute; use FB03 to review individual document detail as needed.]",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Pull the automated elimination logic's output (the elimination journal or summary) for the same period.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Reconcile the full transaction-level population against the elimination output line by line, rather than comparing only the summary elimination total against the intercompany balance.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "For any transaction coded under a legacy entity code from the pre-merger system, confirm specifically whether the elimination logic recognizes that legacy code — this is the most likely place a transaction silently fails to eliminate.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "The full intercompany transaction population (FBL3N/FB03 export) reconciled transaction-by-transaction against the elimination journal, with legacy entity-coded transactions specifically flagged.",
+    "pitfall": "A clean summary elimination total can still be hiding individual transactions that never eliminated at all if an equal and opposite error exists elsewhere — always reconcile at the transaction level, not the summary level."
+  },
+  {
+    "book_num": 12,
+    "part_numeral": "III",
+    "part_title": "R2R & Consolidation — Post-Merger Specific",
+    "sort_order": 12,
+    "shortname": "The Subsidiary That Didn't Get the Memo",
+    "subtitle": "Record to Report — M&A Integration",
+    "intro": "Confirm that a parent-level control's tested population explicitly includes every consolidated entity individually, rather than assuming a control effective at headquarters automatically extends to a newly acquired subsidiary.",
+    "exec_table": [
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Identify the parent-level control in scope and confirm its documented population statement — specifically, whether it names every consolidated entity individually or refers to 'the organization' generally.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Pull the list of all currently consolidated entities, including any acquired within the test period, from the consolidation system or corporate structure chart.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "For each entity, independently confirm the control was actually performed for that entity's own data — not assumed to be covered because the control operated correctly at headquarters.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Document any newly acquired or newly consolidated entity where the control's actual population does not include that entity's data, and trace how long the gap has existed since consolidation began.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "The current consolidated entity list cross-referenced against entity-by-entity confirmation that the parent-level control's population actually included each entity's own data.",
+    "pitfall": "A control's population statement written before an acquisition does not automatically expand to include a newly consolidated entity — confirm the actual tested population entity-by-entity, every period, not just at the point the control was originally designed."
+  },
+  {
+    "book_num": 13,
+    "part_numeral": "III",
+    "part_title": "R2R & Consolidation — Post-Merger Specific",
+    "sort_order": 13,
+    "shortname": "The Override at 11:58 PM",
+    "subtitle": "Record to Report — Management Override",
+    "intro": "Confirm what changed between a late-cycle estimate adjustment and its immediately preceding version, and whether genuinely new information — rather than proximity to a reporting deadline or target — explains the timing.",
+    "exec_table": [
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Identify the late-cycle estimate adjustment in scope and its exact timestamp relative to the reporting deadline.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Pull the immediately preceding version of the same estimate, along with its supporting calculation or source data.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Isolate exactly what changed between the two versions — which specific input, assumption, or judgment moved, and by how much.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Assess whether genuinely new information available between the two versions explains the change, or whether the timing and direction of the adjustment (moving a result toward a specific target) is the more plausible explanation, and document either conclusion with the specific evidence supporting it.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "Both versions of the estimate side by side, with the specific changed input isolated and the timing of the adjustment relative to the reporting deadline documented.",
+    "pitfall": "The size of an estimate adjustment is not the primary signal to test — the timing relative to a deadline and the presence (or absence) of genuinely new information behind the change matter more than whether the number moved a little or a lot."
+  },
+  {
+    "book_num": 14,
+    "part_numeral": "III",
+    "part_title": "R2R & Consolidation — Post-Merger Specific",
+    "sort_order": 14,
+    "shortname": "The Control Designed to Fail",
+    "subtitle": "Record to Report — Whistleblower",
+    "intro": "Confirm that the individual named in a control's documentation actually receives the full information the control's stated purpose requires them to assess, independent of whether the control is being performed exactly as documented.",
+    "exec_table": [
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Identify the control in scope and the individual named in its documentation as the reviewer or approver.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Confirm exactly what information that individual actually receives in the normal course of performing the control — the specific report, system view, or data feed, not the control narrative's description of what they should receive.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Independently assess whether that actual information is sufficient to detect the specific type of issue the control's stated purpose claims to catch.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Where the reviewer's actual information is structurally insufficient — for example, a summary view that excludes the detail needed to spot the issue — document this as a design deficiency, separate from and regardless of whether the control has been performed exactly as documented every period.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "The actual report or system view the named reviewer receives, compared against what the control's documented purpose requires them to be able to assess.",
+    "pitfall": "Testing operating effectiveness (did the reviewer sign off) is not the same as testing design effectiveness (could the reviewer have caught the issue at all) — a control can pass the first test completely and still be structurally incapable of catching what it claims to catch."
+  },
+  {
+    "book_num": 15,
+    "part_numeral": "IV",
+    "part_title": "GRC Platform, Governance & Cross-Domain — Post-Migration and Multi-Entity",
+    "sort_order": 15,
+    "shortname": "The Ruleset From the Old System",
+    "subtitle": "GRC Access Risk Analysis",
+    "intro": "Confirm that new Fiori apps and OData authorization objects introduced by a system migration are matched by corresponding rules in the SoD ruleset, rather than assuming a ruleset that runs cleanly is necessarily current.",
+    "exec_table": [
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Identify the Fiori apps introduced by the system migration that did not exist in the pre-migration environment.",
+        "screenshot": null
+      },
+      {
+        "tool": "SAP GUI",
+        "code": "LPD_CUST / SICF",
+        "directions": "Trace each new app's underlying OData service and its backend authorization object requirement. [Navigation: type LPD_CUST in the command field and press Enter (or SICF to view the OData service node directly), locate the app's tile configuration or service node, and identify the bound authorization object(s).]",
+        "screenshot": null
+      },
+      {
+        "tool": "GRC Access Control",
+        "code": "GRAC_ARA",
+        "directions": "Confirm whether the SoD ruleset contains a rule referencing the newly identified authorization object(s). [Navigation: from the GRC Fiori Launchpad or NWBC, open the Rule Maintenance app under Access Risk Analysis rule set configuration, search for the specific authorization object, and confirm whether any rule references it.]",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Where no corresponding rule exists, document this as a ruleset currency gap — the ruleset can run cleanly and completely indefinitely while remaining structurally blind to an entire category of newly introduced access.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "The list of new Fiori apps introduced by the migration, each traced to its backend authorization object, cross-referenced against the SoD ruleset's actual rule coverage for those objects.",
+    "pitfall": "A ruleset that produces zero violations is not evidence of a clean access environment if it was never updated to recognize the authorization objects a recent platform migration introduced."
+  },
+  {
+    "book_num": 16,
+    "part_numeral": "IV",
+    "part_title": "GRC Platform, Governance & Cross-Domain — Post-Migration and Multi-Entity",
+    "sort_order": 16,
+    "shortname": "The Risk With Nothing Watching It",
+    "subtitle": "GRC Risk Management / Process Control",
+    "intro": "Confirm that a risk register entry's documented mitigating control actually exists and is active in GRC Process Control and change management, rather than trusting the register's own apparent completeness.",
+    "exec_table": [
+      {
+        "tool": "GRC Risk Management",
+        "code": "Risk Workbench",
+        "directions": "Pull the current risk register and its documented risk-control linkages for the entity/process in scope. [Navigation: from the Fiori Launchpad, open the Risk Workbench app (or in NWBC, GRC → Risk Management → Risk Workbench), select the risk in scope, and open its linked controls.]",
+        "screenshot": null
+      },
+      {
+        "tool": "GRC Process Control",
+        "code": "Manage Controls",
+        "directions": "For each linked control, independently confirm it exists and is currently active in GRC Process Control, rather than trusting the risk register's own linkage field as sufficient evidence. [Navigation: from the Fiori Launchpad, open the Process Control – Manage Controls app, search for the control ID referenced in the risk register, and confirm its current status.]",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Where a control is confirmed active, trace its most recent test result or evidence to confirm it is not just configured but actually operating.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Document any risk with a documented linkage to a control that is missing, inactive, or has no recent evidence of operation as a risk that is effectively unmitigated despite appearing covered in the register.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "The Risk Workbench linkage export cross-referenced against each linked control's actual status and most recent evidence in GRC Process Control.",
+    "pitfall": "A populated 'mitigating control' field in a risk register is a documentation artifact, not proof of an active, operating control — confirm actual existence and current evidence independently every time."
+  },
+  {
+    "book_num": 17,
+    "part_numeral": "IV",
+    "part_title": "GRC Platform, Governance & Cross-Domain — Post-Migration and Multi-Entity",
+    "sort_order": 17,
+    "shortname": "The Repeat Offender",
+    "subtitle": "Governance — Remediation Tracking",
+    "intro": "Confirm that a mechanism exists to periodically re-test previously remediated findings against whatever has changed in the surrounding system since, rather than treating a clean historical retest as permanently valid.",
+    "exec_table": [
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Pull the log of previously remediated findings for the population and period in scope.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "For a sample of previously remediated findings, confirm whether any periodic re-testing trigger exists — a defined point at which the finding is automatically revisited given system, process, or personnel changes since remediation.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Where a re-testing trigger exists, confirm it actually fired when it should have, based on the specific changes that occurred since the original remediation.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Where no re-testing trigger exists, independently re-test a sample of the previously remediated findings against the current environment, and document any finding that has silently recurred since its original closure.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "The remediation log for the sampled findings, with independent re-test results (or confirmation of a working re-testing trigger) documented for each.",
+    "pitfall": "A finding closed as remediated in a prior period is not permanently resolved — without a mechanism to revisit it as the surrounding environment changes, a genuinely fixed control today can quietly break again tomorrow with nobody watching for it."
+  },
+  {
+    "book_num": 18,
+    "part_numeral": "IV",
+    "part_title": "GRC Platform, Governance & Cross-Domain — Post-Migration and Multi-Entity",
+    "sort_order": 18,
+    "shortname": "The Summary That Didn't Match the Work",
+    "subtitle": "Governance — Executive & Board",
+    "intro": "Confirm that a board or executive summary is fully backed by completed, evidenced testing work before issuance, and was not drafted with confident conclusions ahead of the underlying results.",
+    "exec_table": [
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Pull the board or executive summary in scope and identify every specific factual claim it makes about testing status, findings, or conclusions.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "For each claim, trace it back to the underlying detailed workpaper or testing evidence that was actually completed as of the summary's stated date.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Confirm the summary's stated completion date and conclusions were actually achievable given the underlying work's real completion date — not drafted with confident language ahead of the results actually being in.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Document any claim in the summary that outpaces the underlying evidence available as of the date it was issued, distinct from a claim that is simply wrong.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "The issued board/executive summary with each material claim traced to its underlying workpaper and the workpaper's actual completion date.",
+    "pitfall": "A summary can be entirely well-intentioned and still materially overstate status if it was drafted on a confident forecast of results rather than the results actually in hand at the time of issuance — test the dates, not just the content."
+  },
+  {
+    "book_num": 19,
+    "part_numeral": "IV",
+    "part_title": "GRC Platform, Governance & Cross-Domain — Post-Migration and Multi-Entity",
+    "sort_order": 19,
+    "shortname": "The Signature Nobody Read First",
+    "subtitle": "Governance — Multi-Entity Certification",
+    "intro": "Confirm that a certifying officer's documented engagement with a multi-entity certification package is proportionate to its volume and complexity, and treat a same-day signature on a substantial package as a signal worth independently investigating.",
+    "exec_table": [
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Pull the certifying officer's signed multi-entity certification package and its signature timestamp.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Independently assess the volume and complexity of the package — number of entities, number of exceptions or open items, and total page/section count.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Compare the time between the package being made available to the officer and the signature timestamp against the package's actual volume and complexity.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Where the elapsed time is implausibly short given the package's complexity, treat this as a signal warranting further inquiry into the officer's actual engagement, and document the specific timeline and package characteristics as evidence, not as a conclusion on its own.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "The certification package with its full timeline (availability date, signature timestamp) and a documented assessment of its volume and complexity.",
+    "pitfall": "A same-day or rapid signature is a signal to investigate further, not proof of an inadequate certification on its own — confirm through follow-up (interview, comparison to prior periods) before drawing a conclusion from timing alone."
+  },
+  {
+    "book_num": 20,
+    "part_numeral": "IV",
+    "part_title": "GRC Platform, Governance & Cross-Domain — Post-Migration and Multi-Entity",
+    "sort_order": 20,
+    "shortname": "The Request That Found the Gap",
+    "subtitle": "Cross-Domain — Data Privacy + Access",
+    "intro": "Confirm which individuals accessed a specific sensitive record and cross-reference each against their actual job role and legitimate business need, surfacing access exposure that a privacy incident response alone would not identify.",
+    "exec_table": [
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Identify the specific sensitive record that was the subject of the privacy request or incident in scope.",
+        "screenshot": null
+      },
+      {
+        "tool": "SAP GUI",
+        "code": "SUIM",
+        "directions": "Pull the full list of individuals who accessed that specific record during the relevant period. [Navigation: type SUIM in the command field and press Enter, use the User Information System's change-document or table-access logging report for the record in question, restrict to the record's key and the relevant date range, and execute.]",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Cross-reference each individual who accessed the record against their actual job role and a documented, legitimate business need for that specific record.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Document any individual whose access cannot be tied to a legitimate business need as a broader access-exposure finding, distinct from and going beyond the scope of the original privacy request or incident that prompted the test.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "The SUIM access list for the record in question, cross-referenced against each accessing individual's job role and documented business need.",
+    "pitfall": "Responding to a privacy incident by confirming the specific record involved is not the same as testing who else had unnecessary access to it — the incident response and the access-exposure test are two different questions and both need answering."
+  },
+  {
+    "book_num": 21,
+    "part_numeral": "IV",
+    "part_title": "GRC Platform, Governance & Cross-Domain — Post-Migration and Multi-Entity",
+    "sort_order": 21,
+    "shortname": "The Module Nobody Licensed",
+    "subtitle": "Cross-Domain — Licensing + Change Management",
+    "intro": "Confirm that a module's technical activation status matches its actual licensed scope, and that any module activated through an emergency change path outside confirmed licensing triggers a same-week licensing follow-up.",
+    "exec_table": [
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Identify the module or functionality activated through the emergency change in scope.",
+        "screenshot": null
+      },
+      {
+        "tool": "SAP GUI",
+        "code": "USMM",
+        "directions": "Confirm the module's technical activation status in the system's own license measurement output. [Navigation: type USMM in the command field and press Enter, run the measurement, and locate the specific module/engine in the resulting usage report to confirm it shows as active.]",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Independently compare the module's activation status against the organization's actual current license agreement, rather than assuming activation implies licensing.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Where the module was activated outside confirmed licensing, confirm whether the emergency change process itself includes a same-week licensing follow-up requirement, and document whether that follow-up actually occurred for this specific change.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "The USMM measurement output showing the module's activation status, cross-referenced against the current license agreement and any documented same-week licensing follow-up.",
+    "pitfall": "A module's technical activation and its licensed status are two separate facts that can silently diverge, especially through an emergency change path — confirm both independently rather than treating activation as implicit proof of licensing."
+  },
+  {
+    "book_num": 22,
+    "part_numeral": "IV",
+    "part_title": "GRC Platform, Governance & Cross-Domain — Post-Migration and Multi-Entity",
+    "sort_order": 22,
+    "shortname": "The Transfer Nobody Mapped",
+    "subtitle": "Legal & Compliance — Cross-Border Data",
+    "intro": "Confirm that a cross-border data transfer map includes not just primary application data flows but backup and disaster recovery replication paths, which routinely move personal data across jurisdictions without privacy-compliance evaluation.",
+    "exec_table": [
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Pull the organization's current cross-border data transfer map for the systems and entities in scope.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Confirm whether the map includes primary application data flows only, or also backup and disaster recovery replication paths.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Where backup/DR paths are not included, trace the actual physical or logical location of backup and DR replicas for the systems in scope, independent of the primary application's documented data residency.",
+        "screenshot": null
+      },
+      {
+        "tool": "—",
+        "code": "—",
+        "directions": "Document any backup or DR replication path that moves personal data across a jurisdictional boundary not reflected in the current transfer map, and assess whether this path has ever been evaluated through a privacy compliance lens at all.",
+        "screenshot": null
+      }
+    ],
+    "evidence": "The current cross-border data transfer map compared against the actual backup/DR replication topology for the systems in scope.",
+    "pitfall": "A data transfer map that looks comprehensive for primary application flows can still miss the majority of actual cross-border movement if backup and disaster recovery replication was never in scope for the mapping exercise in the first place."
+  }
+]
